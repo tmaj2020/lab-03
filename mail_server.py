@@ -24,11 +24,22 @@ def load_mail() -> List[Dict[str, str]]:
 
 def save_mail(mail: List[Dict[str, str]]) -> None:
     """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    Summary: Saves current list of mail entries to the mail_db.json file for future reference
+    
+    Args:
+    	mail (List[Dict[str, str]]): list of mail that will replace previous list of entries
     """
     thisdir.joinpath('mail_db.json').write_text(json.dumps(mail, indent=4))
 
 def add_mail(mail_entry: Dict[str, str]) -> str:
     """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    Summary: Add's a mail entry to the list of dictionaries representing mail entries
+    
+    Args:
+    	mail_entry (Dict[str, str]): mail entry that is being added to current dictionary list
+    	
+    Returns:
+    	Newly generated, unique 'id' for added mail entry 
     """
     mail = load_mail()
     mail.append(mail_entry)
@@ -38,6 +49,13 @@ def add_mail(mail_entry: Dict[str, str]) -> str:
 
 def delete_mail(mail_id: str) -> bool:
     """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    Summary: Search's for and delete's mail entry with a specific ID
+    
+    Args:
+    	mail_id (str): 'id' string of the mail entry to be removed
+    
+    Returns:
+    	Bool: True if mail entry was found and deleted, false if entry id wasn't found
     """
     mail = load_mail()
     for i, entry in enumerate(mail):
@@ -50,6 +68,13 @@ def delete_mail(mail_id: str) -> bool:
 
 def get_mail(mail_id: str) -> Optional[Dict[str, str]]:
     """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    Summary: Get's a specific mail entry from list of dictionaries based on entrie's 'id'
+    	
+    Args:
+    	mail_id (str): Unique 'id' of the mail entry to be grabbed
+
+    Returns:
+    	Optional[Dict[str,]]: returns as mail entry if found in list, returns as nothing if not
     """
     mail = load_mail()
     for entry in mail:
@@ -60,6 +85,13 @@ def get_mail(mail_id: str) -> Optional[Dict[str, str]]:
 
 def get_inbox(recipient: str) -> List[Dict[str, str]]:
     """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    Summary: Finds all messages that would go to specified recipients 'inbox'
+    
+    Args:
+    	recipient (str): name of the recipient, whose inbox is being grabbed
+    	
+    Returns:
+    	List[Dict[str, str]]: List of mail entries that are going to the specified recipient's 	inbox
     """
     mail = load_mail()
     inbox = []
@@ -71,6 +103,13 @@ def get_inbox(recipient: str) -> List[Dict[str, str]]:
 
 def get_sent(sender: str) -> List[Dict[str, str]]:
     """TODO: fill out this docstring (using the load_mail docstring as a guide)
+    Summary: Grabs all of the mail entries being sent by a particular person or 'sender'
+    
+    Args:
+    	sender (str): Individual whose sent mail is being grabbed
+    	
+    Returns:
+    	List[Dict[str, str]]: Returns list of dictionary of mail entries from that specific sender
     """
     mail = load_mail()
     sent = []
@@ -107,7 +146,9 @@ def delete_mail_route(mail_id: str):
         bool: True if the mail was deleted, False otherwise
     """
     # TODO: implement this function
-    pass # remove this line
+    delete = jsonify(delete_mail(mail_id))
+    return delete
+    
 
 @app.route('/mail/<mail_id>', methods=['GET'])
 def get_mail_route(mail_id: str):
@@ -142,7 +183,20 @@ def get_inbox_route(recipient: str):
 # TODO: implement a rout e to get all mail entries for a sender
 # HINT: start with soemthing like this:
 #   @app.route('/mail/sent/<sender>', ...)
-
+@app.route('/mail/sent/<sender>', methods=['GET'])
+def get_sender_route(sender: str):
+	"""
+	Summary: Gets all mail entries coming from a sender from the json file
+	
+	Args:
+		sender (str): Sender of the mail being grabbed
+		
+	Returns:
+		list: a list of dictionaries representing mail entries from the sender
+	"""
+	res = jsonify(get_sent(sender))
+	res.status_code = 200
+	return res
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
